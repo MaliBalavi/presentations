@@ -19,6 +19,7 @@ Decks are generated with [`pptxgenjs`](https://gitbrent.github.io/PptxGenJS/) vi
 ```text
 decks/<name>/deck.js      # generator
 decks/<name>/deck.pptx    # output (committed)
+decks/<name>/deck.pdf     # export (committed) — GitHub renders PDFs in the browser
 ```
 
 ```bash

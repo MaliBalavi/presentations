@@ -1,0 +1,13 @@
+# rendered previews
+preview/
+thumbs*/
+thumbnails*/
+
+# runtime
+node_modules/
+.server.pid
+server.log
+*.log
+
+# os junk
+.DS_Store

@@ -350,7 +350,7 @@ pres.addSection({ title: "Uvod" });
 
 // ---------------------------------------------------------------- 2 problem
 {
-  const s = contentSlide("Problem", "Pet sekundi snimka, cela baza pesama");
+  const s = contentSlide("Problem", "Zašto je prepoznavanje pesme teško");
 
   addText(s, "5 s", {
     x: 0.8,
@@ -370,7 +370,7 @@ pres.addSection({ title: "Uvod" });
     color: C.muted,
   });
   s.addImage({ path: WAVE, x: 0.8, y: 3.95, w: 5.1, h: 0.91, altText: "Talasan oblik audio signala" });
-  addText(s, "Snimak retko stiže čist — i to je ceo problem.", {
+  addText(s, "Snimak retko stiže čist — i to je prva prepreka.", {
     x: 0.82,
     y: 5.15,
     w: 5.2,
@@ -381,9 +381,9 @@ pres.addSection({ title: "Uvod" });
   });
 
   const items = [
-    ["01", "Šum, kompresija, reverb", "Signal sa telefona menja se pre nego što stigne do modela."],
+    ["01", "Prljav snimak", "Zvuk koji je snimljen nikada nije isti kao original: šum, kompresija, reverb."],
     ["02", "Ista pesma, druga verzija", "Kover ili snimak uživo menja frekvencijsku sliku."],
-    ["03", "Baza koja raste", "Pretraga mora da ostane tačna i brza i sa milionima zapisa."],
+    ["03", "Milion pesama u bazi", "Pretraga mora da ostane tačna i brza."],
   ];
   items.forEach(([num, head, body], i) => {
     const y = 1.9 + i * 1.32;

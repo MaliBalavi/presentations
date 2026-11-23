@@ -11,3 +11,6 @@ server.log
 
 # os junk
 .DS_Store
+
+# local render artifacts from preview/QA
+slide-*.jpg

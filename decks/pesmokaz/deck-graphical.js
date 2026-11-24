@@ -18,9 +18,7 @@
 // Run: node deck-graphical.js   (validate with the pptx skill's scripts/office/validate.py)
 const path = require("path");
 const pptxgen = require("pptxgenjs");
-const { applyTheme } = require(
-  "/home/andrej/.config/opencode/skills/pptx/scripts/apply_theme.js",
-);
+const { applyTheme } = require("../../lib/apply_theme.js");
 
 const A = path.join(__dirname, "assets");
 const LOGO = path.join(A, "pfe-logo.png");
@@ -1059,7 +1057,7 @@ setSection("Metoda");
 // ---------------------------------------------------------------- 7 hashing
 {
   const s = newSlide("light", "Metoda");
-  heading(s, "Poravnanje: sa 70 na 97,56");
+  heading(s, "Poravnanje: sa 78 na 97,56");
 
   const steps = [
     ["1", "Pikovi", "Maximum filter 16×16 na mel spektrogramu; zadržavamo pikove iznad praga 0,25."],
@@ -1119,7 +1117,7 @@ setSection("Metoda");
   });
   const pts = [
     [0, 25, "original", T.grey],
-    [1, 70, "tuning", T.grey],
+    [1, 78, "tuning", T.grey],
     [2, 97.56, "poravnanje", T.teal],
   ];
   const px = (i) => cx + (i * cw) / 2;
@@ -1174,7 +1172,7 @@ setSection("Metoda");
     "Matematička metoda radi na mel spektrogramu. Prvo izvučemo lokalne maksimume — filter 16 puta 16, prag 0,25. " +
       "Za svaki pik napravimo 15 heševa sa susedima: frekvencija pika, frekvencija cilja i vremenski pomeraj. " +
       "Ključni korak je pretraga: ne brojimo samo poklapanja, nego tražimo pomak na kome se najviše poklapaju. " +
-      "To je podiglo tačnost sa oko 70 na 97,56 odsto — najveći pojedinačni doprinos u celom radu. (70 s)",
+      "To je podiglo tačnost sa 78 na 97,56 odsto — najveći pojedinačni doprinos u celom radu. (70 s)",
   );
 }
 

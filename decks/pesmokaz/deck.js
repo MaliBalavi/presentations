@@ -16,14 +16,13 @@
 // Run: node deck.js   (validate with the pptx skill's scripts/office/validate.py)
 const path = require("path");
 const pptxgen = require("pptxgenjs");
-const { applyTheme } = require(
-  "/home/andrej/.config/opencode/skills/pptx/scripts/apply_theme.js",
-);
+const { applyTheme } = require("../../lib/apply_theme.js");
 
 const A = path.join(__dirname, "assets");
 const LOGO = path.join(A, "pfe-logo.png");
 const SPEC_BAND = path.join(A, "spectrogram-band.png");
 const WAVE = path.join(A, "waveform.png");
+const GA = path.join(A, "graficki-apstrakt.png");
 
 const LANG = "sr-Latn-RS";
 
@@ -842,10 +841,130 @@ setSection("Metoda");
   );
 }
 
-// ---------------------------------------------------------------- 7 hashing
+// ---------------------------------------------------------------- 7 cache
 {
   const s = newSlide("light", "Metoda");
-  heading(s, "Poravnanje: sa 70 na 97,56");
+  heading(s, "Dataset se prekomputuje jednom");
+
+  tx(s, "~71.000", {
+    x: M - 0.09,
+    y: 1.5,
+    w: 5.6,
+    h: 1.75,
+    face: F.display,
+    size: 84,
+    bold: true,
+    color: T.teal,
+  });
+  tx(s, "mel spektrograma u kešu", {
+    x: M,
+    y: 3.22,
+    w: 5.4,
+    h: 0.32,
+    size: 18,
+    color: T.ink,
+  });
+  tx(s, "776 pesama × ~91 isečak · 128 × 215 float32 · ~110 KB po isečku", {
+    x: M,
+    y: 3.64,
+    w: 5.5,
+    h: 0.6,
+    size: 13,
+    color: T.muted,
+  });
+
+  tx(s, "7,8 GB", {
+    x: M - 0.04,
+    y: 4.34,
+    w: 3.4,
+    h: 0.62,
+    face: F.display,
+    size: 40,
+    bold: true,
+    color: T.ink,
+  });
+  tx(s, "keša na disku, više od 5,5 GB MP3 dataseta", {
+    x: M,
+    y: 5.0,
+    w: 5.2,
+    h: 0.3,
+    size: 13,
+    color: T.muted,
+  });
+
+  tx(s, "Bez keša, svaki prolaz", {
+    x: 6.75,
+    y: 1.66,
+    w: 5.8,
+    h: 0.26,
+    size: 12,
+    color: T.muted,
+  });
+  ["MP3 dekodiranje i resample", "isečci od 5 s i loudnorm", "STFT i mel filterbank"].forEach(
+    (label, i) => {
+      const y = 2.04 + i * 0.44;
+      tx(s, "×", {
+        x: 6.75,
+        y: y - 0.04,
+        w: 0.26,
+        h: 0.3,
+        size: 14,
+        bold: true,
+        color: T.grey,
+      });
+      tx(s, label, { x: 7.1, y, w: 5.4, h: 0.3, size: 15, color: T.greyDeep });
+    },
+  );
+  hline(s, 6.75, 3.46, 5.8, T.rule, 0.75);
+
+  tx(s, "Sa kešom", { x: 6.75, y: 3.66, w: 5.8, h: 0.26, size: 12, color: T.tealDeep });
+  tx(s, "np.load() → tenzor → trening", {
+    x: 6.75,
+    y: 3.98,
+    w: 5.9,
+    h: 0.4,
+    size: 19,
+    bold: true,
+    color: T.ink,
+  });
+  tx(s, "Isti keš služi evaluaciji i indeksiranju baze.", {
+    x: 6.75,
+    y: 4.44,
+    w: 5.9,
+    h: 0.3,
+    size: 13,
+    color: T.muted,
+  });
+
+  tx(s, "Isti keš služi treniranju, evaluaciji i indeksiranju baze.", {
+    x: M,
+    y: 5.86,
+    w: CW,
+    h: 0.3,
+    size: 18,
+    bold: true,
+    color: T.ink,
+  });
+  tx(s, "--resume preskače već izračunato; crna lista isključuje korumpirane fajlove.", {
+    x: M,
+    y: 6.36,
+    w: CW,
+    h: 0.26,
+    size: 11,
+    color: T.muted,
+  });
+
+  notes(
+    "Pre treniranja ceo dataset prolazi kroz isti lanac jednom: dekodiranje, isečci, normalizacija i mel spektrogram. " +
+      "Rezultat je oko 71.000 malih .npy fajlova, jedan po isečku. Trening onda samo učitava niz sa diska — nema MP3 dekodiranja ni STFT-a po epohi. " +
+      "Isti keš koristimo i za evaluaciju i za pravljenje baze. Cena je oko 7,8 GB na disku, više od samih MP3 fajlova; to je svesna razmena. (40 s)",
+  );
+}
+
+// ---------------------------------------------------------------- 8 hashing
+{
+  const s = newSlide("light", "Metoda");
+  heading(s, "Poravnanje: sa 78 na 97,56");
 
   const steps = [
     ["1", "Pikovi", "Maximum filter 16×16 na mel spektrogramu; zadržavamo pikove iznad praga 0,25."],
@@ -905,7 +1024,7 @@ setSection("Metoda");
   });
   const pts = [
     [0, 25, "original", T.grey],
-    [1, 70, "tuning", T.grey],
+    [1, 78, "tuning", T.grey],
     [2, 97.56, "poravnanje", T.teal],
   ];
   const px = (i) => cx + (i * cw) / 2;
@@ -960,11 +1079,11 @@ setSection("Metoda");
     "Matematička metoda radi na mel spektrogramu. Prvo izvučemo lokalne maksimume — filter 16 puta 16, prag 0,25. " +
       "Za svaki pik napravimo 15 heševa sa susedima: frekvencija pika, frekvencija cilja i vremenski pomeraj. " +
       "Ključni korak je pretraga: ne brojimo samo poklapanja, nego tražimo pomak na kome se najviše poklapaju. " +
-      "To je podiglo tačnost sa oko 70 na 97,56 odsto — najveći pojedinačni doprinos u celom radu. (70 s)",
+      "To je podiglo tačnost sa 78 na 97,56 odsto — najveći pojedinačni doprinos u celom radu. (70 s)",
   );
 }
 
-// ---------------------------------------------------------------- 8 CNN
+// ---------------------------------------------------------------- 9 CNN
 {
   const s = newSlide("light", "Metoda");
   heading(s, "Embedding umesto heša");
@@ -1074,9 +1193,65 @@ setSection("Metoda");
   );
 }
 
+// ---------------------------------------------------------------- 10 determinism
+{
+  const s = newSlide("light", "Metoda");
+  heading(s, "Ista pesma, isti vektor — svaki put");
+
+  const locks = [
+    ["Fiksiran ulaz", "22050 Hz mono; prvo isečak od 5 s, pa normalizacija po isečku."],
+    ["Fiksirana transformacija", "n_fft 2048, hop 512, 128 mel filtera; isti prozor i opseg."],
+    ["Jedan thread", "ONNX Runtime na CPU; inter_op i intra_op postavljeni na 1."],
+    ["Fiksan šum u evaluaciji", "seed 42; isti niz za obe metode, isti upiti."],
+    ["float32 i L2 norma", "Embedding jedinične norme; to je vektor koji ulazi u FAISS."],
+  ];
+  locks.forEach(([head, body], i) => {
+    const y = 1.66 + i * 0.86;
+    tick(s, M, y - 0.02, 0.22, T.teal, 2);
+    tx(s, head, { x: M + 0.32, y: y - 0.08, w: 6.9, h: 0.3, size: 17, bold: true, color: T.ink });
+    tx(s, body, { x: M + 0.32, y: y + 0.28, w: 6.8, h: 0.3, size: 13, color: T.muted });
+  });
+
+  vline(s, 8.15, 1.6, 3.0, T.rule, 0.75);
+  tx(s, "Granica", { x: 8.45, y: 1.6, w: 3.8, h: 0.26, size: 12, color: T.muted });
+  tx(s, "Determinizam važi za isti ONNX Runtime, isti provajder i isti hardver.", {
+    x: 8.45,
+    y: 2.0,
+    w: 4.05,
+    h: 0.9,
+    size: 15,
+    color: T.ink,
+  });
+  tx(s, "float32 nije bit-egzaktan između platformi; to ne tvrdimo.", {
+    x: 8.45,
+    y: 2.98,
+    w: 4.05,
+    h: 0.9,
+    size: 15,
+    color: T.ink,
+  });
+
+  tx(s, "U inferenci nema poziva RNG-a; šum u evaluaciji je zaključan seedom.", {
+    x: M,
+    y: 6.12,
+    w: CW,
+    h: 0.3,
+    size: 16,
+    color: T.ink,
+  });
+
+  notes(
+    "Neuronska grana nije deterministička sama po sebi — to smo morali da obezbedimo. " +
+      "Svaki korak je zaključan: ulaz se prvo seče pa normalizuje po isečku, mel transformacija ima fiksne parametre, " +
+      "ONNX Runtime radi na CPU sa jednim thread-om, a šum u evaluaciji dolazi iz seeda 42 koji dele obe metode. " +
+      "Embedding izlazi kao float32 i normalizovan je na jedinicu. " +
+      "Granica je iskrena: to važi za isti runtime i isti hardver; između platformi float32 nije bit-egzaktan. (45 s)",
+  );
+}
+
 setSection("Rezultati");
 
-// ---------------------------------------------------------------- 9 accuracy
+// ---------------------------------------------------------------- 11 accuracy
 {
   const s = newSlide("light", "Rezultati");
   heading(s, "Tačnost: heširanje vodi na svakoj metriki");
@@ -1188,7 +1363,7 @@ setSection("Rezultati");
   );
 }
 
-// ---------------------------------------------------------------- 10 speed
+// ---------------------------------------------------------------- 12 speed
 {
   const s = newSlide("light", "Rezultati");
   heading(s, "Prostor za veći model");
@@ -1299,7 +1474,7 @@ setSection("Rezultati");
   );
 }
 
-// ---------------------------------------------------------------- 11 why
+// ---------------------------------------------------------------- 13 why
 {
   const s = newSlide("light", "Rezultati");
   heading(s, "Zašto heširanje pobeđuje ovde");
@@ -1361,7 +1536,38 @@ setSection("Rezultati");
   );
 }
 
-// ---------------------------------------------------------------- 12 future
+// ---------------------------------------------------------------- 14 graphical abstract
+{
+  const s = newSlide("light", "Rezultati");
+  heading(s, "Ceo rad na jednoj slici");
+
+  s.addImage({
+    path: GA,
+    x: 1.37,
+    y: 1.52,
+    w: 10.6,
+    h: 4.94,
+    altText:
+      "Grafički apstrakt: ulazni snimak, normalizacija, mel spektrogram, matematička i CNN grana, rang lista",
+  });
+
+  tx(s, "Grafički apstrakt rada. Isti ulaz i ista normalizacija; grane se razlikuju u reprezentaciji i pretrazi.", {
+    x: M,
+    y: 6.55,
+    w: CW,
+    h: 0.26,
+    size: 11,
+    color: T.muted,
+  });
+
+  notes(
+    "Ovo je grafički apstrakt rada i ujedno najkraći sažetak svega što smo pokazali. " +
+      "Levo je ulaz i zajednički deo lanca; u sredini se račva na heširanje i CNN embedding; desno je ista rang lista za obe metode. " +
+      "Poenta slike je da razlika nije u podacima ni u protokolu, nego samo u tome kako se isečak predstavlja i kako se pretražuje. (30 s)",
+  );
+}
+
+// ---------------------------------------------------------------- 15 future
 {
   const s = newSlide("light", "Rezultati");
   heading(s, "Šta sledi");
@@ -1408,7 +1614,7 @@ setSection("Rezultati");
 
 setSection("Zaključak");
 
-// ---------------------------------------------------------------- 13 conclusion
+// ---------------------------------------------------------------- 16 conclusion
 {
   const s = newSlide("close", "Zaključak");
 

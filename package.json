@@ -1,0 +1,12 @@
+{
+  "name": "presentations",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pesmokaz deck generators and preview tooling",
+  "scripts": {
+    "build": "cd decks/pesmokaz && node deck.js"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}

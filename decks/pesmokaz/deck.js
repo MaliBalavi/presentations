@@ -657,9 +657,40 @@ pres.addSection({ title: "Uvod" });
   );
 }
 
+// ---------------------------------------------------------------- 5 graphical abstract
+{
+  const s = newSlide("light", "Uvod");
+  heading(s, "Ceo rad na jednoj slici");
+
+  s.addImage({
+    path: GA,
+    x: 1.37,
+    y: 1.52,
+    w: 10.6,
+    h: 4.94,
+    altText:
+      "Grafički apstrakt: ulazni snimak, normalizacija, mel spektrogram, matematička i CNN grana, rang lista",
+  });
+
+  tx(s, "Grafički apstrakt rada. Isti ulaz i ista normalizacija; grane se razlikuju u reprezentaciji i pretrazi.", {
+    x: M,
+    y: 6.55,
+    w: CW,
+    h: 0.26,
+    size: 11,
+    color: T.muted,
+  });
+
+  notes(
+    "Ovo je grafički apstrakt rada i ujedno najkraći sažetak svega što smo pokazali. " +
+      "Levo je ulaz i zajednički deo lanca; u sredini se račva na heširanje i CNN embedding; desno je ista rang lista za obe metode. " +
+      "Poenta slike je da razlika nije u podacima ni u protokolu, nego samo u tome kako se isečak predstavlja i kako se pretražuje. (30 s)",
+  );
+}
+
 setSection("Metoda");
 
-// ---------------------------------------------------------------- 5 pipeline
+// ---------------------------------------------------------------- 6 pipeline
 {
   const s = newSlide("light", "Metoda");
   heading(s, "Prvo isečak, pa normalizacija");
@@ -746,7 +777,7 @@ setSection("Metoda");
   );
 }
 
-// ---------------------------------------------------------------- 6 dataset
+// ---------------------------------------------------------------- 7 dataset
 {
   const s = newSlide("light", "Metoda");
   heading(s, "776 pesama, 16 žanrova, pet nivoa šuma");
@@ -841,7 +872,7 @@ setSection("Metoda");
   );
 }
 
-// ---------------------------------------------------------------- 7 cache
+// ---------------------------------------------------------------- 8 cache
 {
   const s = newSlide("light", "Metoda");
   heading(s, "Dataset se prekomputuje jednom");
@@ -961,7 +992,7 @@ setSection("Metoda");
   );
 }
 
-// ---------------------------------------------------------------- 8 hashing
+// ---------------------------------------------------------------- 9 hashing
 {
   const s = newSlide("light", "Metoda");
   heading(s, "Poravnanje: sa 78 na 97,56");
@@ -1083,7 +1114,7 @@ setSection("Metoda");
   );
 }
 
-// ---------------------------------------------------------------- 9 CNN
+// ---------------------------------------------------------------- 10 CNN
 {
   const s = newSlide("light", "Metoda");
   heading(s, "Embedding umesto heša");
@@ -1193,7 +1224,7 @@ setSection("Metoda");
   );
 }
 
-// ---------------------------------------------------------------- 10 determinism
+// ---------------------------------------------------------------- 11 determinism
 {
   const s = newSlide("light", "Metoda");
   heading(s, "Ista pesma, isti vektor — svaki put");
@@ -1251,7 +1282,7 @@ setSection("Metoda");
 
 setSection("Rezultati");
 
-// ---------------------------------------------------------------- 11 accuracy
+// ---------------------------------------------------------------- 12 accuracy
 {
   const s = newSlide("light", "Rezultati");
   heading(s, "Tačnost: heširanje vodi na svakoj metriki");
@@ -1363,7 +1394,7 @@ setSection("Rezultati");
   );
 }
 
-// ---------------------------------------------------------------- 12 speed
+// ---------------------------------------------------------------- 13 speed
 {
   const s = newSlide("light", "Rezultati");
   heading(s, "Prostor za veći model");
@@ -1474,7 +1505,7 @@ setSection("Rezultati");
   );
 }
 
-// ---------------------------------------------------------------- 13 why
+// ---------------------------------------------------------------- 14 why
 {
   const s = newSlide("light", "Rezultati");
   heading(s, "Zašto heširanje pobeđuje ovde");
@@ -1533,37 +1564,6 @@ setSection("Rezultati");
     "Zašto onda heširanje pobeđuje? Zato što smo ga testirali na njegovom terenu: zašumljeni originali, ne koveri. " +
       "Poravnanje koristi vremensku strukturu pesme, a ne samo prisustvo heševa — zato je tako jako. " +
       "CNN-ova prednost na strukturnim mutacijama ostaje neproverena; to je pošteno reći i pre nego što nas pitaju. (50 s)",
-  );
-}
-
-// ---------------------------------------------------------------- 14 graphical abstract
-{
-  const s = newSlide("light", "Rezultati");
-  heading(s, "Ceo rad na jednoj slici");
-
-  s.addImage({
-    path: GA,
-    x: 1.37,
-    y: 1.52,
-    w: 10.6,
-    h: 4.94,
-    altText:
-      "Grafički apstrakt: ulazni snimak, normalizacija, mel spektrogram, matematička i CNN grana, rang lista",
-  });
-
-  tx(s, "Grafički apstrakt rada. Isti ulaz i ista normalizacija; grane se razlikuju u reprezentaciji i pretrazi.", {
-    x: M,
-    y: 6.55,
-    w: CW,
-    h: 0.26,
-    size: 11,
-    color: T.muted,
-  });
-
-  notes(
-    "Ovo je grafički apstrakt rada i ujedno najkraći sažetak svega što smo pokazali. " +
-      "Levo je ulaz i zajednički deo lanca; u sredini se račva na heširanje i CNN embedding; desno je ista rang lista za obe metode. " +
-      "Poenta slike je da razlika nije u podacima ni u protokolu, nego samo u tome kako se isečak predstavlja i kako se pretražuje. (30 s)",
   );
 }
 

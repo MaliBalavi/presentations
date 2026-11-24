@@ -52,39 +52,45 @@ Svaki slajd služi ovoj rečenici; ništa što joj ne služi ne ulazi u deck.
 - Tri doprinosa: (1) kompletan lanac sa testovima, (2) zajednički Python interfejs za obe metode, (3) protokol na 776 pesama / 5 nivoa šuma.
 - Vizuel: tri numerisana bloka, hipoteza kao citat.
 
-### 5. Sistem / lanac obrade (75 s) — **ključni slajd**
+### 5. Grafički apstrakt (30 s) — NOVO
+- Grafički apstrakt rada u celosti: isti ulaz i normalizacija, grane se razlikuju u reprezentaciji i pretrazi.
+- Vizuel: slika `graficki-apstrakt.png` (render iz `graficki-apstrakt.svg`), široka preko slajda.
+- Poruka: jedna slika sažima ceo sistem; razlika je samo u reprezentaciji isečka.
+- Napomena: GA u SVG-u još piše „INT8“; videti nalaz br. 8 ispod.
+
+### 6. Sistem / lanac obrade (75 s) — **ključni slajd**
 - Ulaz → isečci 5 s / preklapanje 2,5 s → normalizacija po isečku na −23 LUFS → mel spektrogram (128 filtera) → opcioni U-Net denojzer → dve grane (heševi | embedding) → pretraga → rang lista.
 - **Insight koji treba da se zapamti:** prvo isečak, pa normalizacija. Da se normalizuje ceo fajl pa deli, isti segment bi dobio različitu normalizaciju kod različitih snimaka.
 - Vizuel: horizontalni flow, zelena/violet grana; mali „zašto“ callout za redosled.
 - Notes: 22050 Hz, n_fft 2048 (~93 ms), hop 512 (~23 ms), ~215 frejmova po isečku.
 
-### 6. Skup podataka i protokol (55 s)
+### 7. Skup podataka i protokol (55 s)
 - 1000 izabranih → 224 korumpirane (MD5) → **776 upotrebljivih**, 16 žanrova, ~5,5 GB.
 - ~71.000 isečaka; podela **po pesmama** (ne po isečcima) → nema curenja.
 - 5 nivoa šuma: −5, 0, 5, 10, 20 dB; isti RNG za obe metode; **7281 zašumljeni upit**.
 - Metrike: top-1/3/5/10 + MRR; tie-break leksikografski po ID-u pesme.
 - Vizuel: 4 stat-tile broja + skala nivoa šuma; žanrovska raspodela kao tanka traka (χ² = 24,21, df = 15 — ne odbacuje ravnomernost).
 
-### 7. Keširani spektrogrami (40 s) — NOVO
+### 8. Keširani spektrogrami (40 s) — NOVO
 - 776 pesama × ~91 isečak = ~71.000 mel spektrograma, izračunatih jednom i sačuvanih kao `.npy`.
 - Bez keša, svaki prolaz: MP3 dekodiranje, isečci + loudnorm, STFT + mel filterbank. Sa kešom: `np.load()` → tenzor → trening.
 - Isti keš služi treniranju, evaluaciji i indeksiranju baze (`build_db_from_cache.py`).
 - Cena: ~7,8 GB na disku, više od 5,5 GB MP3 dataseta. `--resume` preskače već izračunato.
 - Vizuel: veliki „~71.000“ broj levo, „pre/posle“ lista desno, donji red sa cenom i dobitkom.
 
-### 8. Matematička metoda (70 s)
+### 9. Matematička metoda (70 s)
 - Mel spektrogram → `scipy` maximum filter 16×16 → pikovi iznad praga 0,25 → **15 heševa po piku**, uz ograničenja pomeraja → heš `(f1, f2, Δt)`.
 - Pretraga: **vremensko poravnanje**; ocena = najveći broj poklopljenih heševe na jednom pomaku.
 - Poruka: **poravnanje je heroj** — 78 % → 97,56 %.
 - Vizuel: spektrogram sa označenim pikom i strelicama ka susedima; mali histogram poklapanja po pomaku.
 
-### 9. CNN metoda (55 s)
+### 10. CNN metoda (55 s)
 - ResNet-18, jednokanalni ulaz (mel), **128-d L2 embedding**, triplet loss sa hard mining.
 - ONNX izvoz; pretraga najbližih suseda preko FAISS (L2).
 - Vizuel: spektrogram → blokovi CNN → vektor 128 → 3 najbliža suseda.
 - Notes: konvergencija na epohi 26, posle toga overfitting.
 
-### 10. Determinizam neuronske grane (45 s) — NOVO
+### 11. Determinizam neuronske grane (45 s) — NOVO
 - Ulaz se prvo seče pa normalizuje po isečku; mel transformacija ima fiksne parametre (22050 Hz, n_fft 2048, hop 512, 128 mel).
 - ONNX Runtime na CPU, `inter_op_num_threads = intra_op_num_threads = 1`.
 - Evaluacija koristi seed 42; isti niz šuma za obe metode.
@@ -92,7 +98,7 @@ Svaki slajd služi ovoj rečenici; ništa što joj ne služi ne ulazi u deck.
 - Granica: važi za isti ONNX Runtime, isti provajder i isti hardver; float32 nije bit-egzaktan između platformi.
 - Vizuel: pet redova sa tick-om levo, blok „granica“ desno.
 
-### 11. Rezultati — tačnost (65 s)
+### 12. Rezultati — tačnost (65 s)
 - Tabela + grupisan bar chart, zelena vs violet:
   | | Math | CNN |
   |---|---|---|
@@ -104,24 +110,18 @@ Svaki slajd služi ovoj rečenici; ništa što joj ne služi ne ulazi u deck.
 - Poruka: **razlika od 16 procentnih poena u top-1.**
 - Notes: tabela je primarna, chart je za brzinu čitanja; ne tvrditi statističku značajnost (nema CI/testa).
 
-### 12. Brzina i evolucija (65 s)
+### 13. Brzina i evolucija (65 s)
 - Latencija: **16 ms** CNN vs **325 ms** matematika (~20×), na 20-pesmenom benchmarku.
 - Evolucija matematike: 25 % → 78 % (tuning heševa/praga/DT) → **97,56 %** (poravnanje).
 - Konvergencija: top-1 raste do epohE 26, zatim blagi pad → dodatno treniranje nije put.
 - Vizuel: levo dve latencije, desno step chart evolucije; convergence kao mali inset ili rezervni slajd.
 - Notes: eksplicitno reći da je benchmark mali; heš pretraga raste sa bazom (ograničenje).
 
-### 13. Zašto heširanje pobeđuje ovde (50 s)
+### 14. Zašto heširanje pobeđuje ovde (50 s)
 - Upiti su **zašumljeni originali**, ne koveri/uživo → domen u kome heširanje ima prirodnu prednost.
 - Poravnanje koristi vremensku strukturu pesme, ne samo prisustvo heševa.
 - Prototip na 12 pesama: 98,68 % standardno / 86,03 % stress → pad na 81,39 % sa 776 pesama.
 - Vizuel: dve kolone „testirali smo / nismo testirali“; mutacije jasno u drugoj koloni.
-
-### 14. Grafički apstrakt (30 s) — NOVO
-- Grafički apstrakt rada u celosti: isti ulaz i normalizacija, grane se razlikuju u reprezentaciji i pretrazi.
-- Vizuel: slika `graficki-apstrakt.png` (render iz `graficki-apstrakt.svg`), široka preko slajda.
-- Poruka: jedna slika sažima ceo sistem; razlika je samo u reprezentaciji isečka.
-- Napomena: GA u SVG-u još piše „INT8“; videti nalaz br. 6 ispod.
 
 ### 15. Ograničenja i budući rad (45 s)
 - Nisu testirani koveri i izvođenja uživo; nema reverba; nema razlaganja po nivou šuma.

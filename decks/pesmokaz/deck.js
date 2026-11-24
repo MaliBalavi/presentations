@@ -7,7 +7,7 @@
           F12 (the hero test is a 1280x800 rule; the cover is judged at projector distance instead) ·
           58 (the two method slides run past 80 words; the parameter names are the content of a defense) ·
           82 (the four figure row on the dataset slide is the dataset itself, not a decorative count)
-   dropped: A2 metrike and A5 ograničenja (user approved; the limitations now sit on slide 11) · the invented
+   dropped: A1–A5 backup slides (user approved; the talk now runs 13 slides) · the invented
             neighbour distances 0,12 / 0,31 / 0,58
    reworded: "Lanac obrade: prvo isečak, pa normalizacija" to "Prvo isečak, pa normalizacija" · 19 names the label
    reworded: "Heširanje i duboko učenje rešavaju isti problem drugačije" to "Dve porodice metoda" · 58 names the length
@@ -22,8 +22,6 @@ const { applyTheme } = require(
 
 const A = path.join(__dirname, "assets");
 const LOGO = path.join(A, "pfe-logo.png");
-const SPEC = path.join(A, "spectrogram.png");
-const SPEC_DARK = path.join(A, "spectrogram-dark.png");
 const SPEC_BAND = path.join(A, "spectrogram-band.png");
 const WAVE = path.join(A, "waveform.png");
 
@@ -170,18 +168,6 @@ function caption(slide, text, o = {}) {
     h: 0.24,
     size: 10.5,
     color: T.muted,
-  });
-}
-
-function qaTag(slide) {
-  tx(slide, "rezerva", {
-    x: 11.86,
-    y: 0.62,
-    w: 0.69,
-    h: 0.24,
-    size: 10.5,
-    color: T.muted,
-    align: "right",
   });
 }
 
@@ -446,35 +432,113 @@ pres.addSection({ title: "Uvod" });
     tx(s, line, { x: M, y: 2.52 + i * 0.38, w: 5.3, h: 0.28, size: 15, color: T.ink });
   });
 
-  // spectrogram with peaks and hash links
+  // peak map: every mark is a peak; one peak pair is labelled
   const ix = M;
   const iy = 3.86;
   const iw = 5.0;
   const ih = 1.44;
-  s.addImage({ path: SPEC, x: ix, y: iy, w: iw, h: ih, altText: "Mel spektrogram sintetičkog primera" });
+  const gx = (f) => ix + f * iw;
+  const gy = (f) => iy + (1 - f) * ih;
+
+  hline(s, ix, iy + ih, iw, T.rule, 1);
+  vline(s, ix, iy, ih, T.rule, 1);
+  [1 / 3, 2 / 3].forEach((f) => hline(s, ix, gy(f), iw, T.rule, 0.5));
+
   const peaks = [
-    [0.12, 0.3], [0.22, 0.18], [0.31, 0.34], [0.45, 0.22], [0.58, 0.36], [0.7, 0.24],
+    [0.08, 0.62], [0.30, 0.30], [0.38, 0.66], [0.50, 0.46],
+    [0.55, 0.82], [0.72, 0.34], [0.82, 0.58], [0.92, 0.42],
   ];
-  peaks.forEach(([px, py]) => {
+  peaks.forEach(([t, f]) => dot(s, gx(t), gy(f), 0.085, T.teal));
+
+  const a = [0.18, 0.40];
+  const b = [0.62, 0.72];
+  s.addShape(S.line, {
+    x: gx(a[0]),
+    y: gy(a[1]),
+    w: gx(b[0]) - gx(a[0]),
+    h: 0,
+    line: { color: T.greyDeep, width: 0.75, dashType: "sysDot" },
+  });
+  s.addShape(S.line, {
+    x: gx(b[0]),
+    y: gy(a[1]),
+    w: 0,
+    h: gy(b[1]) - gy(a[1]),
+    line: { color: T.greyDeep, width: 0.75, dashType: "sysDot" },
+  });
+  s.addShape(S.line, {
+    x: gx(a[0]),
+    y: gy(a[1]),
+    w: gx(b[0]) - gx(a[0]),
+    h: gy(b[1]) - gy(a[1]),
+    line: { color: T.ink, width: 1.25 },
+  });
+  [a, b].forEach(([t, f]) => {
     s.addShape(S.ellipse, {
-      x: ix + px * iw - 0.045,
-      y: iy + py * ih - 0.045,
-      w: 0.09,
-      h: 0.09,
-      fill: { color: T.paper },
-      line: { color: T.ink, width: 1 },
+      x: gx(t) - 0.06,
+      y: gy(f) - 0.06,
+      w: 0.12,
+      h: 0.12,
+      fill: { color: T.ink },
+      line: { color: T.paper, width: 1.25 },
     });
   });
-  [[0, 1], [1, 2], [3, 4], [4, 5]].forEach(([a, b]) => {
-    s.addShape(S.line, {
-      x: ix + peaks[a][0] * iw,
-      y: iy + peaks[a][1] * ih,
-      w: (peaks[b][0] - peaks[a][0]) * iw,
-      h: (peaks[b][1] - peaks[a][1]) * ih,
-      line: { color: T.ink, width: 0.75 },
-    });
+
+  tx(s, "f₁", {
+    x: gx(a[0]) - 0.04,
+    y: gy(a[1]) - 0.3,
+    w: 0.32,
+    h: 0.22,
+    size: 11,
+    bold: true,
+    color: T.ink,
+    align: "center",
   });
-  caption(s, "pikovi i parovi u spektrogramu, šema", { y: 5.38, w: 5.2 });
+  tx(s, "f₂", {
+    x: gx(b[0]) + 0.08,
+    y: gy(b[1]) - 0.3,
+    w: 0.32,
+    h: 0.22,
+    size: 11,
+    bold: true,
+    color: T.ink,
+  });
+  tx(s, "Δt", {
+    x: (gx(a[0]) + gx(b[0])) / 2 - 0.18,
+    y: gy(a[1]) + 0.05,
+    w: 0.36,
+    h: 0.2,
+    size: 10.5,
+    color: T.greyDeep,
+    align: "center",
+  });
+  tx(s, "Δf", {
+    x: gx(b[0]) - 0.46,
+    y: (gy(a[1]) + gy(b[1])) / 2 - 0.1,
+    w: 0.4,
+    h: 0.2,
+    size: 10.5,
+    color: T.greyDeep,
+    align: "right",
+  });
+  tx(s, "frekvencija ↑", {
+    x: ix + 0.06,
+    y: iy + 0.02,
+    w: 1.0,
+    h: 0.18,
+    size: 9.5,
+    color: T.greyDeep,
+  });
+  tx(s, "vreme →", {
+    x: ix + iw - 0.85,
+    y: iy + ih - 0.22,
+    w: 0.85,
+    h: 0.18,
+    size: 9.5,
+    color: T.greyDeep,
+    align: "right",
+  });
+  caption(s, "pikovi, jedan par i pomeraj Δt, šema", { y: 5.38, w: 5.2 });
 
   // right
   tx(s, "Duboko učenje", {
@@ -626,11 +690,11 @@ setSection("Metoda");
   });
 
   const lanes = [
-    ["Matematička grana", "pikovi → heševi → vremensko poravnanje", T.tealDeep, 3.56],
-    ["CNN grana", "mel → ResNet-18 → 128-d embedding", T.greyDeep, 4.18],
+    ["Matematička grana", "pikovi → heševi → vremensko poravnanje", 3.56],
+    ["CNN grana", "mel → ResNet-18 → 128-d embedding", 4.18],
   ];
-  lanes.forEach(([head, body, color, y]) => {
-    tx(s, head, { x: M, y, w: 3.2, h: 0.32, size: 17, bold: true, color });
+  lanes.forEach(([head, body, y]) => {
+    tx(s, head, { x: M, y, w: 3.2, h: 0.32, size: 17, bold: true, color: T.ink });
     tx(s, body, { x: 4.3, y: y + 0.02, w: 7.0, h: 0.3, size: 14.5, color: T.ink });
   });
 
@@ -821,11 +885,11 @@ setSection("Metoda");
     align: "center",
   });
 
-  // evolution chart
-  const cx = 7.75;
+  // evolution: three measured points on one scale, no connecting curve
+  const cx = 7.95;
   const cy = 4.55;
   const ch = 2.05;
-  const cw = 3.95;
+  const cw = 3.75;
   const yOf = (v) => cy - (v / 100) * ch;
   [0, 50, 100].forEach((v) => {
     hline(s, cx - 0.45, yOf(v), cw + 0.5, T.rule, 0.75);
@@ -840,36 +904,34 @@ setSection("Metoda");
     });
   });
   const pts = [
-    [0, 25, "original"],
-    [1, 70, "tuning"],
-    [2, 97.56, "poravnanje"],
+    [0, 25, "original", T.grey],
+    [1, 70, "tuning", T.grey],
+    [2, 97.56, "poravnanje", T.teal],
   ];
   const px = (i) => cx + (i * cw) / 2;
-  for (let i = 0; i < pts.length - 1; i++) {
+  pts.forEach(([i, v, label, color]) => {
     s.addShape(S.line, {
-      x: px(pts[i][0]),
-      y: yOf(pts[i][1]),
-      w: px(pts[i + 1][0]) - px(pts[i][0]),
-      h: yOf(pts[i + 1][1]) - yOf(pts[i][1]),
-      line: { color: T.teal, width: 2 },
+      x: px(i),
+      y: yOf(v),
+      w: 0,
+      h: cy - yOf(v),
+      line: { color, width: 2 },
     });
-  }
-  pts.forEach(([i, v, label]) => {
-    dot(s, px(i), yOf(v), 0.13, T.teal);
+    dot(s, px(i), yOf(v), 0.15, color);
     tx(s, `${String(v).replace(".", ",")} %`, {
-      x: px(i) - 0.7,
-      y: yOf(v) - 0.32,
-      w: 1.4,
-      h: 0.26,
-      size: 13,
+      x: px(i) - 0.75,
+      y: yOf(v) - 0.36,
+      w: 1.5,
+      h: 0.3,
+      size: 18,
       bold: true,
       color: i === 2 ? T.tealDeep : T.ink,
       align: "center",
     });
     tx(s, label, {
-      x: px(i) - 0.7,
+      x: px(i) - 0.75,
       y: cy + 0.12,
-      w: 1.4,
+      w: 1.5,
       h: 0.24,
       size: 10.5,
       color: T.muted,
@@ -1390,205 +1452,6 @@ setSection("Zaključak");
     "Da zatvorim: heširanje je tačnije, CNN je znatno brži, a prednost CNN-a na koverima je otvoreno pitanje koje tek treba testirati. " +
       "Glavni doprinos nije pobednik, nego postavljen protokol koji omogućava da se ovo poredi ponovljivo. Hvala — spremni smo za pitanja. (20 s)",
   );
-}
-
-// ---------------------------------------------------------------- appendix
-setSection("Rezervni slajdovi");
-
-// A1 hash details
-{
-  const s = newSlide("light", "Rezervni slajdovi");
-  qaTag(s);
-  heading(s, "Heš: od pikova do poravnanja", { size: 30 });
-
-  tx(s, "heš = (f₁, f₂, Δt)", {
-    x: M,
-    y: 1.78,
-    w: 6.2,
-    h: 0.6,
-    size: 32,
-    bold: true,
-    color: T.tealDeep,
-  });
-  [
-    "f₁ — frekvencija referentnog pika",
-    "f₂ — frekvencija ciljnog pika",
-    "Δt — vremenski pomeraj između njih",
-  ].forEach((line, i) => {
-    tx(s, line, { x: M, y: 2.6 + i * 0.4, w: 5.6, h: 0.3, size: 15, color: T.ink });
-  });
-
-  tx(s, "Parametri", { x: M, y: 4.72, w: 5.5, h: 0.26, size: 12, color: T.muted });
-  tx(s, "prozor 16 × 16, prag 0,25, fanout 15, ograničen Δt i Δf", {
-    x: M,
-    y: 5.06,
-    w: 5.5,
-    h: 0.6,
-    size: 14,
-    color: T.ink,
-  });
-
-  vline(s, 6.9, 1.85, 3.6, T.rule, 0.75);
-  tx(s, "Zašto poravnanje", { x: 7.2, y: 1.84, w: 5.3, h: 0.3, size: 15, bold: true, color: T.ink });
-  tx(s, "Dva snimka iste pesme imaju iste heševe, ali na različitim apsolutnim vremenima. Brojanje poklapanja bez pomaka meša slučajne pogotke sa stvarnim. Poravnanje traži pomak na kome se poklapa najviše heševa, i time koristi strukturu pesme, a ne samo prisustvo pikova.", {
-    x: 7.2,
-    y: 2.26,
-    w: 5.15,
-    h: 2.4,
-    size: 13.5,
-    color: T.ink,
-  });
-  tx(s, "25 % → 70 % → 97,56 %", {
-    x: 7.2,
-    y: 5.06,
-    w: 5.2,
-    h: 0.42,
-    size: 24,
-    bold: true,
-    color: T.tealDeep,
-  });
-  tx(s, "original, tuning, poravnanje", {
-    x: 7.22,
-    y: 5.56,
-    w: 5.0,
-    h: 0.26,
-    size: 11,
-    color: T.muted,
-  });
-
-  notes("Rezervni slajd ako pitaju kako tačno izgleda heš i zašto poravnanje menja rezultat.");
-}
-
-// A3 genres table
-{
-  const s = newSlide("light", "Rezervni slajdovi");
-  qaTag(s);
-  heading(s, "Raspodela po žanrovima", { size: 30 });
-
-  const genres = [
-    ["Blues", "48", "6,2"], ["Classical", "50", "6,4"], ["Country", "53", "6,8"],
-    ["Easy Listening", "19", "2,4"], ["Electronic", "53", "6,8"], ["Experimental", "50", "6,4"],
-    ["Folk", "55", "7,1"], ["Hip-Hop", "55", "7,1"], ["Instrumental", "45", "5,8"],
-    ["International", "45", "5,8"], ["Jazz", "50", "6,4"], ["Old-Time / Historic", "42", "5,4"],
-    ["Pop", "56", "7,2"], ["Rock", "55", "7,1"], ["Soul-RnB", "49", "6,3"], ["Spoken", "51", "6,6"],
-  ];
-  const rows = [["Žanr", "Pesama", "Udeo"]].concat(genres).concat([["Ukupno", "776", "100"]]);
-  s.addTable(
-    rows.map((r, i) =>
-      r.map((cell, j) => ({
-        text: cell,
-        options: {
-          fontSize: 10,
-          fontFace: F.body,
-          lang: LANG,
-          color: i === 0 || i === rows.length - 1 ? T.ink : T.greyDeep,
-          bold: i === 0 || i === rows.length - 1,
-          align: j === 0 ? "l" : "r",
-          fill: { color: T.paper },
-          border: { type: "solid", pt: 0.5, color: T.rule },
-        },
-      })),
-    ),
-    {
-      x: M,
-      y: 1.78,
-      w: 5.6,
-      colW: [2.9, 1.35, 1.35],
-      rowH: 0.25,
-      margin: 0.04,
-      valign: "mid",
-      border: { type: "solid", pt: 0.5, color: T.rule },
-    },
-  );
-
-  tx(s, "Zašto ravnomerno", { x: 6.95, y: 1.86, w: 5.2, h: 0.3, size: 16, bold: true, color: T.ink });
-  tx(s, "Stratifikacija po 16 žanrova sprečava da model nauči jedan žanr i da rezultat bude posledica sastava skupa. Hi-kvadrat test ne odbacuje ravnomernu raspodelu (χ² = 24,21, df = 15, kritična vrednost ≈ 25,0 pri α = 0,05).", {
-    x: 6.95,
-    y: 2.3,
-    w: 5.3,
-    h: 2.2,
-    size: 13,
-    color: T.ink,
-  });
-  tx(s, "1000 → 776", {
-    x: 6.95,
-    y: 4.66,
-    w: 5.0,
-    h: 0.6,
-    size: 34,
-    bold: true,
-    color: T.tealDeep,
-  });
-  tx(s, "224 korumpirane pesme uklonjene MD5 proverom", {
-    x: 6.97,
-    y: 5.32,
-    w: 5.2,
-    h: 0.4,
-    size: 11.5,
-    color: T.muted,
-  });
-
-  notes("Rezervni slajd sa punom tabelom žanrova i objašnjenjem stratifikacije.");
-}
-
-// A4 hyperparameters
-{
-  const s = newSlide("light", "Rezervni slajdovi");
-  qaTag(s);
-  heading(s, "Sve je fiksirano za ponovljivost", { size: 30 });
-
-  const rows = [
-    ["Parametar", "Vrednost"],
-    ["Frekvencija uzorkovanja", "22050 Hz"],
-    ["Prozor STFT-a (n_fft)", "2048"],
-    ["Korak prozora (hop)", "512"],
-    ["Mel filteri", "128"],
-    ["Isečak i preklapanje", "5,0 s / 2,5 s"],
-    ["Embedding", "128"],
-    ["Fanout", "15"],
-    ["Prag lokalnog maksimuma", "0,25"],
-    ["Nivoi šuma", "−5, 0, 5, 10, 20 dB"],
-  ];
-  s.addTable(
-    rows.map((r, i) =>
-      r.map((cell, j) => ({
-        text: cell,
-        options: {
-          fontSize: 11,
-          fontFace: F.body,
-          lang: LANG,
-          color: i === 0 ? T.ink : T.greyDeep,
-          bold: i === 0,
-          align: j === 0 ? "l" : "r",
-          fill: { color: T.paper },
-          border: { type: "solid", pt: 0.5, color: T.rule },
-        },
-      })),
-    ),
-    {
-      x: M,
-      y: 1.78,
-      w: 7.0,
-      colW: [4.5, 2.5],
-      rowH: 0.4,
-      margin: 0.06,
-      valign: "mid",
-      border: { type: "solid", pt: 0.5, color: T.rule },
-    },
-  );
-
-  vline(s, 8.15, 1.84, 2.9, T.rule, 0.75);
-  tx(s, "Zašto baš tako", { x: 8.45, y: 1.84, w: 4.0, h: 0.3, size: 15, bold: true, color: T.ink });
-  tx(s, "22050 Hz je dovoljno za mel do ~11 kHz i duplo manje podataka od 44,1 kHz.\n\n2048 / 512 daje ~93 ms prozor i 75 % preklapanja, oko 215 frejmova po isečku.\n\n5 s daje kontekst, a 2,5 s preklapanja pokriva granice.", {
-    x: 8.45,
-    y: 2.26,
-    w: 4.1,
-    h: 3.9,
-    size: 12,
-    color: T.muted,
-  });
-
-  notes("Rezervni slajd sa hiperparametrima i obrazloženjem izbora.");
 }
 
 // ---------------------------------------------------------------- write
